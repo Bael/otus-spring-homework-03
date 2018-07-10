@@ -1,0 +1,12 @@
+filename: questions.csv
+locale: en
+quizConfig:
+  questionsMaxCount: 5
+  successRate: 50
+
+application:
+    title: Simple testing application
+    version: 1.0
+
+#debug: true
+#trace: true
