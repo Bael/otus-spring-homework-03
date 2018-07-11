@@ -1,5 +1,3 @@
-filename: questions.csv
-locale: en
 quizConfig:
   questionsMaxCount: 5
   successRate: 50
@@ -7,6 +5,8 @@ quizConfig:
 application:
     title: Simple testing application
     version: 1.0
+    filename: questions.csv
+    locale: en
 
 #debug: true
 #trace: true

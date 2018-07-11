@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.otus.spring.hw3.domain.AnswerOption;
 import ru.otus.spring.hw3.domain.ExamResult;
 import ru.otus.spring.hw3.domain.Question;
-import ru.otus.spring.hw3.utils.LocaleHelper;
+import ru.otus.spring.hw3.utils.TypedMessageHelper;
 
 import java.util.List;
 import java.util.Scanner;
@@ -18,10 +18,10 @@ public class ExamUIConsoleImpl implements ExamUI {
 
     private Scanner in;
     private String userName;
-    private LocaleHelper localeHelper;
+    private TypedMessageHelper typedMessageHelper;
 
-    public ExamUIConsoleImpl(LocaleHelper localeHelper) {
-        this.localeHelper = localeHelper;
+    public ExamUIConsoleImpl(TypedMessageHelper typedMessageHelper) {
+        this.typedMessageHelper = typedMessageHelper;
     }
 
     /// извлекаем выбранные опции
@@ -46,17 +46,17 @@ public class ExamUIConsoleImpl implements ExamUI {
 
         in = new Scanner(System.in);
 
-        printlnText(LocaleHelper.TEXT_WELCOME, null);
+        printlnText(TypedMessageHelper.TEXT_WELCOME, null);
 
         do {
-            printlnText(LocaleHelper.TEXT_ASK_USER_NAME, null);
+            printlnText(TypedMessageHelper.TEXT_ASK_USER_NAME, null);
             userName = in.nextLine();
         } while (userName.trim().equals(""));
         return userName;
     }
 
 
-    /// верной считаем строку с перечислением номеров через запятую
+    // верной считаем строку с перечислением номеров через запятую
     private boolean isValid(String input, Question question) {
         if (input.equals(""))
             return false;
@@ -73,7 +73,7 @@ public class ExamUIConsoleImpl implements ExamUI {
             if (isValid(input, question)) {
                 break;
             } else {
-                printText(LocaleHelper.TEXT_SHOW_RULES_OF_ANSWER, null);
+                printText(TypedMessageHelper.TEXT_SHOW_RULES_OF_ANSWER, null);
 
             }
         } while (true);
@@ -82,7 +82,7 @@ public class ExamUIConsoleImpl implements ExamUI {
     }
 
     private void printQuestion(Question question) {
-        printlnText(LocaleHelper.TEXT_ASK_SELECT_OPTIONS, new String[]{String.valueOf(question.getAvailableOptionsCount())});
+        printlnText(TypedMessageHelper.TEXT_ASK_SELECT_OPTIONS, new String[]{String.valueOf(question.getAvailableOptionsCount())});
 
         question.getOptions().forEach(answerOption -> System.out.println(answerOption.toString()));
     }
@@ -90,10 +90,10 @@ public class ExamUIConsoleImpl implements ExamUI {
     @Override
     public void reportResult(ExamResult result) {
 
-        String message = LocaleHelper.TEXT_REPORT_SUCESS_RESULT;
+        String message = TypedMessageHelper.TEXT_REPORT_SUCESS_RESULT;
 
         if (!result.IsPassed()) {
-            message = LocaleHelper.TEXT_REPORT_FAILURE_RESULT;
+            message = TypedMessageHelper.TEXT_REPORT_FAILURE_RESULT;
         }
 
         printlnText(message, new String[]{String.valueOf(result.getRate()), String.valueOf(result.getSuccessRate())});
@@ -101,11 +101,11 @@ public class ExamUIConsoleImpl implements ExamUI {
     }
 
     private void printText(String messageType, String[] params) {
-        System.out.print(localeHelper.getLocalizedMessage(messageType, params));
+        System.out.print(typedMessageHelper.getLocalizedMessage(messageType, params));
     }
 
     private void printlnText(String messageType, String[] params) {
-        System.out.println(localeHelper.getLocalizedMessage(messageType, params));
+        System.out.println(typedMessageHelper.getLocalizedMessage(messageType, params));
     }
 
 }

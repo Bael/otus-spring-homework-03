@@ -33,7 +33,8 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('de.codecentric:spring-boot-admin-starter-client')
 	compile('de.codecentric:spring-boot-admin-starter-server')
-	compile('org.springframework.boot:spring-boot-starter-parent')
+
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 

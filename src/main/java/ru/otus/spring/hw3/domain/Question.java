@@ -5,7 +5,6 @@ import java.util.List;
 
 public class Question {
 
-    //private final long id;
     private final double weight;
     private final String text;
     private final List<AnswerOption> options;

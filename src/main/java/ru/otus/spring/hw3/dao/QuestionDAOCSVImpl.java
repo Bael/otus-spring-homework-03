@@ -1,8 +1,7 @@
 package ru.otus.spring.hw3.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import ru.otus.spring.hw3.QuizConfig;
+import org.springframework.stereotype.Service;
+import ru.otus.spring.hw3.AppConfig;
 import ru.otus.spring.hw3.domain.AnswerOption;
 import ru.otus.spring.hw3.domain.Question;
 
@@ -10,31 +9,19 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-
+@Service
 public class QuestionDAOCSVImpl implements QuestionDAO {
 
-    private final QuizConfig config;
+    private final AppConfig config;
 
-
-    public QuestionDAOCSVImpl(QuizConfig config) {
+    public QuestionDAOCSVImpl(AppConfig config) {
         this.config = config;
-        csvFile = config.getFilename();
-        locale = config.getLocale();
-
-        questionsMaxCount = config.getQuizConfig().getQuestionsMaxCount();
     }
-
-    private String csvFile;
-
-    private String locale;
 
 
     /*
@@ -44,8 +31,6 @@ public class QuestionDAOCSVImpl implements QuestionDAO {
       Тип строки (Question или пусто (для ответа))
       строки идут по порядку - строка с вопросом, потом опции ответа.
       **/
-
-    private int questionsMaxCount;
 
     // simple csv reader. copied from https://www.mkyong.com/java/how-to-read-and-parse-csv-file-in-java/
     private ArrayList<String[]> readCSV(File csvFile) {
@@ -74,15 +59,11 @@ public class QuestionDAOCSVImpl implements QuestionDAO {
 
     @Override
     public List<Question> loadQuestions() {
-
-        Path filepath = Paths.get("questions", locale, csvFile);
-        URL url = getClass().getClassLoader().getResource(filepath.toString());
-        File file = new File(url.getFile());
-        ArrayList<String[]> list = readCSV(file);
+        ArrayList<String[]> list = readCSV(config.getCsvFile());
         return getQuestions(list);
     }
 
-    List<Question> getQuestions(ArrayList<String[]> list) {
+    private List<Question> getQuestions(ArrayList<String[]> list) {
         List<Question> questions = new ArrayList<>();
 
 
@@ -103,6 +84,7 @@ public class QuestionDAOCSVImpl implements QuestionDAO {
             } else {
                 rawOptionsMap.compute(questionsCounter, (integer, strings) -> {
                     if (strings == null) {
+
                         strings = new ArrayList<>();
                     }
                     strings.add(fields);
@@ -112,7 +94,7 @@ public class QuestionDAOCSVImpl implements QuestionDAO {
         }
 
         // формируем доменную модель
-        for (int i = 1; i <= Math.min(questionsMaxCount, questionsCounter); i++) {
+        for (int i = 1; i <= questionsCounter; i++) {
             ArrayList<String[]> rawOptions = rawOptionsMap.get(i);
             List<AnswerOption> options = new ArrayList<>();
 
