@@ -30,12 +30,12 @@ ext {
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('de.codecentric:spring-boot-admin-starter-client')
-	compile('de.codecentric:spring-boot-admin-starter-server')
-
-	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile 'org.springframework.boot:spring-boot-starter-actuator'
+	compile 'de.codecentric:spring-boot-admin-starter-client'
+	compile 'de.codecentric:spring-boot-admin-starter-server'
+	compile 'org.springframework.shell:spring-shell-starter:2.0.0.RELEASE'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
 dependencyManagement {
