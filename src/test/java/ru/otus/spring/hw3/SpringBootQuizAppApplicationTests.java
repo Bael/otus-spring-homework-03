@@ -1,13 +1,11 @@
 package ru.otus.spring.hw3;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.spring.hw3.dao.QuestionDAO;
 import ru.otus.spring.hw3.domain.AnswerOption;
@@ -19,36 +17,51 @@ import ru.otus.spring.hw3.service.ExamServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ru.otus.spring.hw3.TestApplicationRunner.class)
 public class SpringBootQuizAppApplicationTests {
 
-
-    @Autowired
-    ExamService examService;
 
     @MockBean
     QuestionDAO questionDAOCSV;
     @MockBean
     QuizConfig quizConfig;
-
+    private ExamService examService;
     private Exam exam;
 
-    private List<AnswerOption> rightOptions = new ArrayList<>();
-
-
     @Test
-    public void examService() {
+    public void examServiceAllowsPass() {
 
+        System.out.println(examService);
+        System.out.println(exam);
+
+        Question q = exam.getNext();
+        assertEquals(false, exam.hasNext());
+        List<AnswerOption> rightOptions = q.getOptions()
+                .stream()
+                .filter(answerOption -> answerOption.getOptionText().equals("Мыши"))
+                .collect(Collectors.toList());
+
+        exam.putUserAnswers(q, rightOptions);
+
+        ExamResult result = examService.checkExam(exam);
+        assertEquals("Test must me passed!", true, result.IsPassed());
+    }
+
+
+    @Before
+    public void setUp() throws Exception {
+
+        examService = new ExamServiceImpl(questionDAOCSV, quizConfig);
         List<AnswerOption> options = new ArrayList<>();
-        AnswerOption rightAnswer = new AnswerOption("Мыши", 1, 3);
 
         options.add(new AnswerOption("Люди", 0, 1));
         options.add(new AnswerOption("Дельфины", 0, 2));
-        options.add(rightAnswer);
+        options.add(new AnswerOption("Мыши", 1, 3));
         options.add(new AnswerOption("Верблюды", 0, 4));
 
         Question question = new Question(1, "Назовите самых разумных созданий на земле согласно кнгие 'Автостопом по галактике' Дугласа Адамса.", options, 1);
@@ -59,31 +72,28 @@ public class SpringBootQuizAppApplicationTests {
                 .thenReturn(questions);
 
         Mockito.when(quizConfig.getSuccessRate()).thenReturn(100.0);
-        rightOptions.add(rightAnswer);
+
 
         exam = examService.prepareExam("Michael");
         assertEquals(false, exam.hasPrevious());
         assertEquals(true, exam.hasNext());
 
+    }
+
+    @Test
+    public void examServiceShouldFail() {
+
         Question q = exam.getNext();
         assertEquals(false, exam.hasNext());
 
+        List<AnswerOption> rightOptions = q.getOptions()
+                .stream()
+                .filter(answerOption -> answerOption.getOptionText().equals("Люди"))
+                .collect(Collectors.toList());
         exam.putUserAnswers(q, rightOptions);
 
         ExamResult result = examService.checkExam(exam);
-        assertEquals(true, result.IsPassed());
-
-    }
-
-
-    @TestConfiguration
-    class QuizAppTestContextConfiguration {
-
-        @Bean
-        public ExamService examService() {
-            return new ExamServiceImpl(questionDAOCSV, quizConfig);
-        }
-
+        assertEquals("Test must me failed!", false, result.IsPassed());
     }
 
 
